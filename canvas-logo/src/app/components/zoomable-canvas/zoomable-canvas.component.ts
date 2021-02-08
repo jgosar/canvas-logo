@@ -1,5 +1,6 @@
-import { Component, ViewChild, ElementRef, OnInit, ChangeDetectionStrategy, OnChanges, SimpleChanges, Input } from '@angular/core';
-import * as $ from 'jquery';
+import { Component, ViewChild, ElementRef, OnInit, ChangeDetectionStrategy, OnChanges, SimpleChanges, Input, HostListener, AfterViewChecked } from '@angular/core';
+import { Subject } from 'rxjs';
+import { debounceTime, takeUntil } from 'rxjs/operators';
 import { multiplyVector, subtractPoints, subtractVectorFromPoint } from 'src/app/helpers/geometry.helpers';
 import { Line } from 'src/app/types/geometry/line';
 import { Point } from 'src/app/types/geometry/point';
@@ -11,43 +12,58 @@ import { Vector } from 'src/app/types/geometry/vector';
   styleUrls: ['./zoomable-canvas.component.less'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ZoomableCanvasComponent implements OnInit, OnChanges {
+export class ZoomableCanvasComponent implements OnInit, OnChanges, AfterViewChecked {
   @Input()
   lines: Line[] = [];
 
-  @ViewChild('myCanvas', { static: true })
-  myCanvas!: ElementRef;
-
-  id: string = Math.random().toString(36).substring(2, 15);
+  @ViewChild('canvasContainer', { static: true })
+  canvasContainer!: ElementRef;
+  @ViewChild('canvas', { static: true })
+  canvas!: ElementRef;
 
   private zoomLevel: number = 0;
   private center: Point = { w: 400, h: 300 };
   private isMouseDown: boolean = false;
   private mouse2Center: Vector = { dw: 0, dh: 0};
   private zoomFactor: number = 1.2;
+  
+  private ngUnsubscribe$: Subject<void> = new Subject();
+  private viewportResized$: Subject<Point> = new Subject<Point>();
 
   ngOnInit(): void {
-    setTimeout(() => {
-      this.resizeAndRedraw();
-    }, 0);
-
-    $(window).resize(() => {
-      this.resizeAndRedraw();
+    this.viewportResized$.pipe(
+      debounceTime(400),
+      takeUntil(this.ngUnsubscribe$)
+    ).subscribe((viewportSize) => {
+      this.resizeAndRedraw(viewportSize);
     });
+    this.onResize();
   }
 
   ngOnChanges(): void {
     this.draw();
   }
 
-  public resizeAndRedraw(): void {
-    const container = $('#' + this.id + 'Container');
-    $('#' + this.id).attr('width', container.width()||null);
-    $('#' + this.id).attr('height', container.height()||null);
+  ngAfterViewChecked(): void {
+    this.onResize();
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize() {
+    const viewportSize: Point = {
+      w: this.canvasContainer.nativeElement.clientWidth,
+      h: this.canvasContainer.nativeElement.clientHeight,
+    };
+    this.viewportResized$.next(viewportSize);
+  }
+
+  public resizeAndRedraw(viewportSize: Point): void {
+    this.canvas.nativeElement.width = viewportSize.w;
+    this.canvas.nativeElement.height = viewportSize.h;
 
     this.center = {
-      w: this.myCanvas.nativeElement.width / 2,
-      h: this.myCanvas.nativeElement.height / 2
+      w: this.canvas.nativeElement.width / 2,
+      h: this.canvas.nativeElement.height / 2
     };
     
     this.draw();
@@ -94,12 +110,12 @@ export class ZoomableCanvasComponent implements OnInit, OnChanges {
   }
 
   private draw() {
-    const context = (this.myCanvas.nativeElement as HTMLCanvasElement).getContext('2d');
+    const context = (this.canvas.nativeElement as HTMLCanvasElement).getContext('2d');
     if(!context){
       return;
     }
 
-    context.clearRect(0, 0, this.myCanvas.nativeElement.width, this.myCanvas.nativeElement.height);
+    context.clearRect(0, 0, this.canvas.nativeElement.width, this.canvas.nativeElement.height);
 
     this.lines.forEach(line=>{
       const startPoint: Point = this.zoomPoint(line.start);

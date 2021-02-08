@@ -1,5 +1,5 @@
-<div [id]="this.id+'Container'" style="width: 100%; height: 100%; background-color: #FFFFFF">
-  <canvas mouseWheel #myCanvas [id]="this.id" (mousemove)="this.mouseMove($event)" (mousedown)="this.mouseDown($event)"
+<div #canvasContainer style="width: 100%; height: 100%; background-color: #FFFFFF">
+  <canvas mouseWheel #canvas (mousemove)="this.mouseMove($event)" (mousedown)="this.mouseDown($event)"
     (mouseup)="this.mouseUp($event)" (selectstart)="this.onSelectStart()" (wheel)="this.onScroll($event)"
     (wheel)="this.onScroll($event)">
   </canvas>
