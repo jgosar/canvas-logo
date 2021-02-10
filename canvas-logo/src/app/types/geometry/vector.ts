@@ -1,4 +1,4 @@
 export interface Vector {
-  dw: number;
-  dh: number;
+  dx: number;
+  dy: number;
 }
