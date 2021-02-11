@@ -51,6 +51,7 @@ export class ZoomableCanvasComponent implements OnInit, OnChanges, AfterViewChec
   }
 
   public resizeAndRedraw(viewportSize: RenderingCoordinates): void {
+    console.log('height: '+viewportSize.y);
     const focus: Point = this.getFocus();
 
     this.canvas.nativeElement.width = viewportSize.x;
