@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component } from "@angular/core";
+import { LogoEngine } from "src/app/services/logo-engine-legacy/logo-engine-legacy";
 import { Line } from "src/app/types/geometry/line";
 
 @Component({
@@ -8,33 +9,23 @@ import { Line } from "src/app/types/geometry/line";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CanvasLogoComponent{
-  testLines: Line[] = [
-    {
-      start: {
-        w:0,
-        h:0,
-      },
-      end: {
-        w:0,
-        h:-100,
-      },
-    },
-    {
-      start: {
-        w:0,
-        h:-100,
-      },
-      end: {
-        w:100,
-        h:100,
-      },
-    },
-  ];
+  lines: Line[] = [];
 
   output: string = 'Hello logo!';
+  currentCommand: string = '';
+
+  private logoEngine: LogoEngine;
+
+  constructor() {
+    this.logoEngine = new LogoEngine();
+
+    this.logoEngine.output.subscribe(text => this.printOutput(text, 'bold'));
+  }
 
   public executeCommand(){
-
+    this.logoEngine.executeCommand(this.currentCommand);
+    this.currentCommand = '';
+    this.lines = [...this.logoEngine.lines];
   }
 
   public historyPrev(){
@@ -43,5 +34,9 @@ export class CanvasLogoComponent{
 
   public historyNext(){
     
+  }
+
+  private printOutput(text: string, style: null | 'red' | 'bold' = null) {
+    this.output += text;//TODO!
   }
 }
