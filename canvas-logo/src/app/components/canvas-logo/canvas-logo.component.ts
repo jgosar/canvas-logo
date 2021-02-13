@@ -1,5 +1,8 @@
-import { ChangeDetectionStrategy, Component } from "@angular/core";
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from "@angular/core";
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 import { LogoEngine } from "src/app/services/logo-engine-legacy/logo-engine-legacy";
+import { LogoStore } from "src/app/services/logo/logo.store";
 import { Line } from "src/app/types/geometry/line";
 
 @Component({
@@ -8,35 +11,51 @@ import { Line } from "src/app/types/geometry/line";
   styleUrls: ['./canvas-logo.component.less'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CanvasLogoComponent{
+export class CanvasLogoComponent implements OnInit, OnDestroy {
   lines: Line[] = [];
 
   output: string = 'Hello logo!';
   currentCommand: string = '';
+  
+  private ngUnsubscribe$: Subject<void> = new Subject();
 
-  private logoEngine: LogoEngine;
+  //private logoEngine: LogoEngine;
 
-  constructor() {
-    this.logoEngine = new LogoEngine();
+  constructor(public store: LogoStore) {
+    //this.logoEngine = new LogoEngine();
 
-    this.logoEngine.output.subscribe(text => this.printOutput(text, 'bold'));
+    //this.logoEngine.output.subscribe(text => this.printOutput(text, 'bold'));
   }
 
-  public executeCommand(){
-    this.logoEngine.executeCommand(this.currentCommand);
+  ngOnInit(): void {
+    this.store.state$
+      .pipe(takeUntil(this.ngUnsubscribe$))
+      .subscribe(state=>{
+          this.lines = state.lines;
+      });
+  }
+
+  ngOnDestroy() {
+      this.ngUnsubscribe$.next();
+      this.ngUnsubscribe$.complete();
+  }
+
+  executeCommand(){
+    //this.logoEngine.executeCommand(this.currentCommand);
     this.currentCommand = '';
-    this.lines = [...this.logoEngine.lines];
+    this.store.executeCommand(this.currentCommand);
+    //this.lines = [...this.logoEngine.lines];
   }
 
-  public historyPrev(){
+  historyPrev(){
 
   }
 
-  public historyNext(){
+  historyNext(){
     
   }
 
-  private printOutput(text: string, style: null | 'red' | 'bold' = null) {
+  printOutput(text: string, style: null | 'red' | 'bold' = null) {
     this.output += text;//TODO!
   }
 }

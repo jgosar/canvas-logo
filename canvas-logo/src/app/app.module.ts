@@ -5,6 +5,8 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppComponent } from './app.component';
 import { CanvasLogoComponent } from './components/canvas-logo/canvas-logo.component';
 import { ZoomableCanvasComponent } from './components/zoomable-canvas/zoomable-canvas.component';
+import { LogoStore } from './services/logo/logo.store';
+import { LogoForwardReducer } from './services/logo/reducers/logo-forward.reducer';
 
 @NgModule({
   declarations: [
@@ -16,7 +18,7 @@ import { ZoomableCanvasComponent } from './components/zoomable-canvas/zoomable-c
     BrowserModule,
     FormsModule
   ],
-  providers: [],
+  providers: [LogoStore, LogoForwardReducer],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
