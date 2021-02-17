@@ -10,8 +10,8 @@ export class LogoForwardReducer implements Reducer<LogoStoreState, string[]>{
   reduce(state: LogoStoreState, args: string[]): LogoStoreState{
     const distance: string = args[0];
     const distanceNum: number = parseFloat(distance);
-    const distanceH = Math.sin(degToRad(state.turtleDirection)) * distanceNum;
-    const distanceW = -Math.cos(degToRad(state.turtleDirection)) * distanceNum;
+    const distanceW = Math.sin(degToRad(state.turtleDirection)) * distanceNum;
+    const distanceH = -Math.cos(degToRad(state.turtleDirection)) * distanceNum;
 
     const newTurtlePosition: Point = {
       w: state.turtlePosition.w + distanceW,

@@ -28,11 +28,11 @@ export class CanvasLogoComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.store.state$
+    /*this.store.state$
       .pipe(takeUntil(this.ngUnsubscribe$))
       .subscribe(state=>{
           this.lines = state.lines;
-      });
+      });*/
   }
 
   ngOnDestroy() {
@@ -42,8 +42,8 @@ export class CanvasLogoComponent implements OnInit, OnDestroy {
 
   executeCommand(){
     //this.logoEngine.executeCommand(this.currentCommand);
-    this.currentCommand = '';
     this.store.executeCommand(this.currentCommand);
+    this.currentCommand = '';
     //this.lines = [...this.logoEngine.lines];
   }
 

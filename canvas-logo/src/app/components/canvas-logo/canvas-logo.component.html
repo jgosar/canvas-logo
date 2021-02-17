@@ -1,5 +1,5 @@
 <div class="cl-canvas-logo__canvas">
-  <cl-zoomable-canvas [lines]="lines"></cl-zoomable-canvas>
+  <cl-zoomable-canvas [lines]="store.state.lines"></cl-zoomable-canvas>
 </div>
 <div class="cl-canvas-logo__input">
   <input [(ngModel)]="currentCommand"
