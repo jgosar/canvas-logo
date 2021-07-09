@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { positiveMod } from 'src/app/helpers/math.helpers';
 import { Reducer } from 'src/app/utils/reducer-store/reducer';
 import { LogoStoreState } from '../logo.store.state';
 
@@ -9,7 +10,7 @@ export class LogoRightReducer implements Reducer<LogoStoreState, string[]>{
     const angleNum: number = parseFloat(angle);
     return {
       ...state,
-      turtleDirection: state.turtleDirection+angleNum
+      turtleDirection: positiveMod(state.turtleDirection+angleNum, 360)
     }
   }
 }
