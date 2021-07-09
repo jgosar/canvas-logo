@@ -1,4 +1,4 @@
 export interface LogoCodeBlock2{
-  command: string;
+  commandText: string;
   numArgs: number;
 }
