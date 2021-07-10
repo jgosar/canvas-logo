@@ -7,9 +7,13 @@ import { LogoCodeBlock2 } from "../types/logo-code-block-2";
 import { LogoVariable2 } from "../types/logo-variable-2";
 import { NativeCodeBlock2 } from "../types/native-code-block-2";
 import { NativeVariable2 } from "../types/native-variable-2";
+import { RegisterLogoCommandReducer } from "./register-logo-command.reducer";
 
 @Injectable()
 export class ExecuteCommandReducer implements Reducer<LogoStoreState, string>{
+  constructor(private registerLogoCommandReducer: RegisterLogoCommandReducer){
+  }
+
   reduce(state: LogoStoreState, command: string): LogoStoreState{
     let newState: LogoStoreState = {...state};
     const beautifiedCommand: string = this.beautifyCommand(command);
@@ -23,7 +27,7 @@ export class ExecuteCommandReducer implements Reducer<LogoStoreState, string>{
       const commandName: string = commandTokens[index];
 
       if (commandName === 'TO') {
-        /*const endIndex: number = commandTokens.findIndex(x => x === 'END');
+        const endIndex: number = commandTokens.findIndex(x => x === 'END');
 
         if (endIndex == -1) {
           throw new Error('Definition of function starting with "TO", must end with "END"');
@@ -32,8 +36,8 @@ export class ExecuteCommandReducer implements Reducer<LogoStoreState, string>{
         const commandDefinition: string[] = commandTokens.slice(index + 1, endIndex); // Cut off starting TO and final END
         this.validateTOCommand(commandDefinition);
 
-        this.executeTOCommand(commandDefinition);
-        index = endIndex + 1;*/
+        newState = this.executeTOCommand(newState, commandDefinition);
+        index = endIndex + 1;
       } else {
         const codeBlock: NativeCodeBlock2|LogoCodeBlock2 = state.codeBlocks[commandName];
 
@@ -149,43 +153,41 @@ export class ExecuteCommandReducer implements Reducer<LogoStoreState, string>{
 
     return result;
   }
-
-  /*
   
 
-  // Input je definicija funkcije, razdeljena v besede, brez začetnega TO in končnega END
+  // Input is a function definition, split into words without starting TO and final END
   private validateTOCommand(commandDefinition: string[]) {
-    if (commandDefinition.length === 0) { // TODO: handlaj še druge rezervirane besede, ki ne morejo biti imena procedur
-      throw new Error('"END" ne more biti ime procedure');
+    if (commandDefinition.length === 0) { // TODO: handle other reserved words
+      throw new Error('"END" cannot be a function name!');
     }
 
     if (commandDefinition.indexOf('TO') !== -1) {
-      throw new Error('Ni možno gnezdit TO statementov!');
+      throw new Error('"TO" statements cannot be nested!');
     }
   }
 
-  // Input je definicija funkcije, razdeljena v besede, brez začetnega TO in končnega END
-  private executeTOCommand(commandDefinition: string[]) {
-    const name: string = commandDefinition[0].toUpperCase(); // Prva beseda je ime funkcije
+  // Input is a function definition, split into words without starting TO and final END
+  private executeTOCommand(state: LogoStoreState, commandDefinition: string[]): LogoStoreState {
+    const commandName: string = commandDefinition[0].toUpperCase(); // The first word is a function name
 
     commandDefinition = commandDefinition.slice(1);
-    const bodyStart: number = commandDefinition.findIndex(x => !x.startsWith(':')); // Začetek bodya funkcije je prva beseda ki se ne začne z :
+    const bodyStart: number = commandDefinition.findIndex(x => !x.startsWith(':')); // Start of the function body is the first word that does not start with :
     const argNames: string[] = commandDefinition.slice(0, bodyStart);
     const numArgs: number = argNames.length;
     let commandBodyWords: string[] = commandDefinition.slice(bodyStart);
     commandBodyWords = commandBodyWords.map(x => {
-      // Imena argumentov v bodyu funkcije zamenjaj z njihovimi indeksi
+      // Replace argument names in the function body with their indexes
       if (x.startsWith(':')) {
         const argumentIndex: number = argNames.findIndex(argName => x === argName);
         if (argumentIndex === -1) {
-          throw new Error('Argument ' + x + ' ni naveden v definiciji funkcije!');
+          throw new Error('Argument ' + x + ' is not a part of the function definition!');
         }
-        x = x.replace(argNames[argumentIndex], '@ARG' + argumentIndex + '@');
+        return x.replace(argNames[argumentIndex], '@ARG' + argumentIndex + '@');
       }
       return x;
     });
     const commandBody = commandBodyWords.join(' ');
-
-    this.addCodeBlock(name, commandBody, numArgs);
-  } */
+    
+    return this.registerLogoCommandReducer.reduce(state, {commandName, commandBody, numArgs});
+  }
 }

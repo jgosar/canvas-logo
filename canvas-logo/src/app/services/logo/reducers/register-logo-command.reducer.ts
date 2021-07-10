@@ -4,7 +4,7 @@ import { LogoStoreState } from "../logo.store.state";
 
 export interface RegisterLogoCommandPayload{
   commandName: string;
-  logoStatements: string;
+  commandBody: string;
   numArgs: number;
 }
 
@@ -16,7 +16,7 @@ export class RegisterLogoCommandReducer implements Reducer<LogoStoreState, Regis
       codeBlocks: {
         ...state.codeBlocks,
         [payload.commandName]: {
-          commandText: payload.logoStatements,
+          commandText: payload.commandBody,
           numArgs: payload.numArgs
         }
       }

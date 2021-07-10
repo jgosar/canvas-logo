@@ -21,7 +21,7 @@ export class LogoStore extends ReducerStore<LogoStoreState>{
     super(new LogoStoreState());
     this.reduce(this.registerNativeCommandReducer,{commandName: 'FD', commandReducer: this.forwardReducer, numArgs: 1});
     this.reduce(this.registerNativeCommandReducer,{commandName: 'RT', commandReducer: this.rightReducer, numArgs: 1});
-    this.reduce(this.registerLogoCommandReducer,{commandName: 'LT', logoStatements: 'RT -@ARG0@', numArgs: 1});
+    this.reduce(this.registerLogoCommandReducer,{commandName: 'LT', commandBody: 'RT -@ARG0@', numArgs: 1});
     this.reduce(this.registerNativeCommandReducer,{commandName: 'REPEAT', commandReducer: this.repeatReducer, numArgs: 2});
   }
 
