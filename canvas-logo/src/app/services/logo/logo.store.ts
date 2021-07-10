@@ -23,6 +23,6 @@ export class LogoStore extends ReducerStore<LogoStoreState>{
   }
 
   executeCommand(command: string) {
-    this.reduce(this.executeCommandReducer, command.split(' '))
+    this.reduce(this.executeCommandReducer, command)
   }
 }
