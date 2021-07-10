@@ -16,7 +16,7 @@ export class ExecuteCommandReducer implements Reducer<LogoStoreState, string>{
 
     const splitCommands: {[key: string]: string} = this.splitCommandByBrackets(beautifiedCommand);
 
-    const commandTokens: string[] = splitCommands['main'].split(' ');
+    const commandTokens: string[] = splitCommands['main'].split(' ').map(token=>token.startsWith('@PRN')?splitCommands[token]:token);
     let index = 0;
 
     while (index < commandTokens.length) {

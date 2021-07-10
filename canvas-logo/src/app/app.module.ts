@@ -8,6 +8,7 @@ import { ZoomableCanvasComponent } from './components/zoomable-canvas/zoomable-c
 import { LogoStore } from './services/logo/logo.store';
 import { ExecuteCommandReducer } from './services/logo/reducers/execute-command.reducer';
 import { LogoForwardReducer } from './services/logo/reducers/logo-forward.reducer';
+import { LogoRepeatReducer } from './services/logo/reducers/logo-repeat.reducer';
 import { LogoRightReducer } from './services/logo/reducers/logo-right.reducer';
 import { RegisterLogoCommandReducer } from './services/logo/reducers/register-logo-command.reducer';
 import { RegisterNativeCommandReducer } from './services/logo/reducers/register-native-command.reducer';
@@ -22,7 +23,7 @@ import { RegisterNativeCommandReducer } from './services/logo/reducers/register-
     BrowserModule,
     FormsModule
   ],
-  providers: [LogoStore, LogoForwardReducer, RegisterNativeCommandReducer, ExecuteCommandReducer, LogoRightReducer, RegisterLogoCommandReducer],
+  providers: [LogoStore, LogoForwardReducer, RegisterNativeCommandReducer, ExecuteCommandReducer, LogoRightReducer, RegisterLogoCommandReducer, LogoRepeatReducer],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
