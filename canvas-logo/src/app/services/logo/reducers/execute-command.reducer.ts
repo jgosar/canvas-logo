@@ -177,9 +177,9 @@ export class ExecuteCommandReducer implements Reducer<LogoStoreState, string>{
     let commandBodyWords: string[] = commandDefinition.slice(bodyStart);
     commandBodyWords = commandBodyWords.map(x => {
       // Replace argument names in the function body with their indexes
-      if (x.startsWith(':')) {
-        const argumentIndex: number = argNames.findIndex(argName => x === argName);
-        if (argumentIndex === -1) {
+      if (x.includes(':')) {
+        const argumentIndex: number = this.findLongestMatchIndex(argNames, x);
+        if (!isDefined(argumentIndex)) {
           throw new Error('Argument ' + x + ' is not a part of the function definition!');
         }
         return x.replace(argNames[argumentIndex], '@ARG' + argumentIndex + '@');
@@ -189,5 +189,19 @@ export class ExecuteCommandReducer implements Reducer<LogoStoreState, string>{
     const commandBody = commandBodyWords.join(' ');
     
     return this.registerLogoCommandReducer.reduce(state, {commandName, commandBody, numArgs});
+  }
+
+  private findLongestMatchIndex(searchWords: string[], text: string): number|undefined{
+    return searchWords.map((word, index)=>({word, index})).sort(this.byWordLengthDesc).filter(wi=>text.includes(wi.word))[0]?.index;
+  }
+  
+  private byWordLengthDesc(a: {word: string, index: number}, b: {word: string, index: number}): number {
+    if ( a.word.length < b.word.length ){
+      return 1;
+    }
+    if ( a.word.length > b.word.length ){
+      return -1;
+    }
+    return 0;
   }
 }
