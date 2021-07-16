@@ -12,7 +12,7 @@ import { LogoPenDownReducer } from './services/logo/reducers/logo-pen-down.reduc
 import { LogoPenUpReducer } from './services/logo/reducers/logo-pen-up.reducer';
 import { LogoRepeatReducer } from './services/logo/reducers/logo-repeat.reducer';
 import { LogoRightReducer } from './services/logo/reducers/logo-right.reducer';
-import { RegisterLogoCommandReducer } from './services/logo/reducers/register-logo-command.reducer';
+import { LogoToReducer } from './services/logo/reducers/logo-to.reducer';
 import { RegisterNativeCommandReducer } from './services/logo/reducers/register-native-command.reducer';
 
 @NgModule({
@@ -25,7 +25,7 @@ import { RegisterNativeCommandReducer } from './services/logo/reducers/register-
     BrowserModule,
     FormsModule
   ],
-  providers: [LogoStore, LogoForwardReducer, RegisterNativeCommandReducer, ExecuteCommandReducer, LogoRightReducer, RegisterLogoCommandReducer, LogoRepeatReducer, LogoPenUpReducer, LogoPenDownReducer],
+  providers: [LogoStore, LogoForwardReducer, RegisterNativeCommandReducer, ExecuteCommandReducer, LogoRightReducer, LogoRepeatReducer, LogoPenUpReducer, LogoPenDownReducer, LogoToReducer],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

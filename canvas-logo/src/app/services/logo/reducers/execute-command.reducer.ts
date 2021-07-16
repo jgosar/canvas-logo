@@ -7,11 +7,11 @@ import { LogoCodeBlock2 } from "../types/logo-code-block-2";
 import { LogoVariable2 } from "../types/logo-variable-2";
 import { NativeCodeBlock2 } from "../types/native-code-block-2";
 import { NativeVariable2 } from "../types/native-variable-2";
-import { RegisterLogoCommandReducer } from "./register-logo-command.reducer";
+import { LogoToReducer } from "./logo-to.reducer";
 
 @Injectable()
 export class ExecuteCommandReducer implements Reducer<LogoStoreState, string>{
-  constructor(private registerLogoCommandReducer: RegisterLogoCommandReducer){
+  constructor(private logoToReducer: LogoToReducer){
   }
 
   reduce(state: LogoStoreState, command: string): LogoStoreState{
@@ -34,9 +34,8 @@ export class ExecuteCommandReducer implements Reducer<LogoStoreState, string>{
         }
 
         const commandDefinition: string[] = commandTokens.slice(index + 1, endIndex); // Cut off starting TO and final END
-        this.validateTOCommand(commandDefinition);
 
-        newState = this.executeTOCommand(newState, commandDefinition);
+        newState = this.logoToReducer.reduce(newState, commandDefinition);
         index = endIndex + 1;
       } else {
         const codeBlock: NativeCodeBlock2|LogoCodeBlock2 = state.codeBlocks[commandName];
@@ -153,56 +152,5 @@ export class ExecuteCommandReducer implements Reducer<LogoStoreState, string>{
     }
 
     return result;
-  }
-  
-
-  // Input is a function definition, split into words without starting TO and final END
-  private validateTOCommand(commandDefinition: string[]) {
-    if (commandDefinition.length === 0) { // TODO: handle other reserved words
-      throw new Error('"END" cannot be a function name!');
-    }
-
-    if (commandDefinition.indexOf('TO') !== -1) {
-      throw new Error('"TO" statements cannot be nested!');
-    }
-  }
-
-  // Input is a function definition, split into words without starting TO and final END
-  private executeTOCommand(state: LogoStoreState, commandDefinition: string[]): LogoStoreState {
-    const commandName: string = commandDefinition[0].toUpperCase(); // The first word is a function name
-
-    commandDefinition = commandDefinition.slice(1);
-    const bodyStart: number = commandDefinition.findIndex(x => !x.startsWith(':')); // Start of the function body is the first word that does not start with :
-    const argNames: string[] = commandDefinition.slice(0, bodyStart);
-    const numArgs: number = argNames.length;
-    let commandBodyWords: string[] = commandDefinition.slice(bodyStart);
-    commandBodyWords = commandBodyWords.map(x => {
-      // Replace argument names in the function body with their indexes
-      if (x.includes(':')) {
-        const argumentIndex: number = this.findLongestMatchIndex(argNames, x);
-        if (!isDefined(argumentIndex)) {
-          throw new Error('Argument ' + x + ' is not a part of the function definition!');
-        }
-        return x.replace(argNames[argumentIndex], '@ARG' + argumentIndex + '@');
-      }
-      return x;
-    });
-    const commandBody = commandBodyWords.join(' ');
-    
-    return this.registerLogoCommandReducer.reduce(state, {commandName, commandBody, numArgs});
-  }
-
-  private findLongestMatchIndex(searchWords: string[], text: string): number|undefined{
-    return searchWords.map((word, index)=>({word, index})).sort(this.byWordLengthDesc).filter(wi=>text.includes(wi.word))[0]?.index;
-  }
-  
-  private byWordLengthDesc(a: {word: string, index: number}, b: {word: string, index: number}): number {
-    if ( a.word.length < b.word.length ){
-      return 1;
-    }
-    if ( a.word.length > b.word.length ){
-      return -1;
-    }
-    return 0;
   }
 }
