@@ -25,6 +25,7 @@ export class LogoStore extends ReducerStore<LogoStoreState>{
     this.reduce(this.registerNativeCommandReducer,{commandName: 'REPEAT', commandReducer: this.repeatReducer, numArgs: 2});
 
     this.executeCommand('TO LT :ANGLE RT -:ANGLE END');
+    this.executeCommand('TO BK :DISTANCE FD -:DISTANCE END');
   }
 
   executeCommand(command: string) {

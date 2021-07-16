@@ -54,11 +54,11 @@ export class ExecuteCommandReducer implements Reducer<LogoStoreState, string>{
         const argValues: string[] = commandArgs.map(arg => this.evaluateArgument(newState, arg));
 
         if(this.isNativeCodeBlock(codeBlock)){
-          newState = (<NativeCodeBlock2>codeBlock).reducer.reduce(newState, commandArgs)
+          newState = (<NativeCodeBlock2>codeBlock).reducer.reduce(newState, argValues)
         } else{
           const commandTextWithArgs: string = this.formatCommandTextWithArgs(
             (<LogoCodeBlock2>codeBlock).commandText,
-            commandArgs,
+            argValues,
           );
           newState = this.reduce(newState, commandTextWithArgs);
         }
@@ -72,8 +72,10 @@ export class ExecuteCommandReducer implements Reducer<LogoStoreState, string>{
   private evaluateArgument(state: LogoStoreState, argument: string): string {
     if (argument.startsWith('\'')) {
       return this.getVariableValue(state, argument.substring(1)).toString();
-    } else {
+    } else if (argument.includes(' ')) {
       return argument;
+    } else {
+      return `${eval(argument)}`;
     }
   }
 
@@ -139,7 +141,6 @@ export class ExecuteCommandReducer implements Reducer<LogoStoreState, string>{
 
           result[prnId] = prnString.substring(1, prnString.length - 1);
           result['main']=replaceAll(result['main'],prnString, prnId);
-          console.log('Replaced bracketed expression' + prnString + ' with ' + prnId);
         }
         if (bracketLevel < 0) {
           throw new Error('More closing than opening brackets! position ' + i);
