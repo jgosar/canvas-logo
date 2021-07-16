@@ -3,5 +3,7 @@ import { LogoStoreState } from "../logo.store.state";
 
 export interface NativeCodeBlock2 {
   reducer: Reducer<LogoStoreState, string[]>;
-  numArgs: number;
+  numArgs?: number;
+  terminatedByEnd?: true;
+  skipArgsEvaluation?: true;
 }

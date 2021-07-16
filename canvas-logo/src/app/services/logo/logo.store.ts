@@ -7,11 +7,13 @@ import { LogoPenDownReducer } from "./reducers/logo-pen-down.reducer";
 import { LogoPenUpReducer } from "./reducers/logo-pen-up.reducer";
 import { LogoRepeatReducer } from "./reducers/logo-repeat.reducer";
 import { LogoRightReducer } from "./reducers/logo-right.reducer";
+import { LogoToReducer } from "./reducers/logo-to.reducer";
 import { RegisterNativeCommandReducer } from "./reducers/register-native-command.reducer";
 
 @Injectable()
 export class LogoStore extends ReducerStore<LogoStoreState>{
   constructor(
+    private toReducer: LogoToReducer,
     private registerNativeCommandReducer: RegisterNativeCommandReducer,
     private executeCommandReducer: ExecuteCommandReducer,
     private forwardReducer: LogoForwardReducer,
@@ -21,6 +23,7 @@ export class LogoStore extends ReducerStore<LogoStoreState>{
     private penDownReducer: LogoPenDownReducer,
   ){
     super(new LogoStoreState());
+    this.reduce(this.registerNativeCommandReducer,{commandName: 'TO', commandReducer: this.toReducer, terminatedByEnd: true, skipArgsEvaluation: true});
     this.reduce(this.registerNativeCommandReducer,{commandName: 'FD', commandReducer: this.forwardReducer, numArgs: 1});
     this.reduce(this.registerNativeCommandReducer,{commandName: 'RT', commandReducer: this.rightReducer, numArgs: 1});
     this.reduce(this.registerNativeCommandReducer,{commandName: 'REPEAT', commandReducer: this.repeatReducer, numArgs: 2});

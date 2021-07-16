@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import { isDefined } from "src/app/helpers/common.helpers";
 import { replaceAll } from "src/app/helpers/string.helpers";
 import { Reducer } from "src/app/utils/reducer-store/reducer";
+import { NativeCodeBlock } from "../../logo-engine-legacy/types/logo-legacy-types";
 import { LogoStoreState } from "../logo.store.state";
 import { LogoCodeBlock2 } from "../types/logo-code-block-2";
 import { LogoVariable2 } from "../types/logo-variable-2";
@@ -25,44 +26,45 @@ export class ExecuteCommandReducer implements Reducer<LogoStoreState, string>{
 
     while (index < commandTokens.length) {
       const commandName: string = commandTokens[index];
+      const codeBlock: NativeCodeBlock2|LogoCodeBlock2 = state.codeBlocks[commandName];
 
-      if (commandName === 'TO') {
+      if (codeBlock === undefined) {
+        throw new Error('Function ' + commandName + ' does not exist!');
+      }
+
+      let commandArgs: string[];
+      if(this.isNativeCodeBlock(codeBlock) && codeBlock.terminatedByEnd){
         const endIndex: number = commandTokens.findIndex(x => x === 'END');
 
         if (endIndex == -1) {
-          throw new Error('Definition of function starting with "TO", must end with "END"');
+          throw new Error(`Call of function ${commandName}, must end with "END"`);
         }
 
-        const commandDefinition: string[] = commandTokens.slice(index + 1, endIndex); // Cut off starting TO and final END
-
-        newState = this.logoToReducer.reduce(newState, commandDefinition);
+        commandArgs = commandTokens.slice(index + 1, endIndex); // Cut off starting command name and final END
         index = endIndex + 1;
-      } else {
-        const codeBlock: NativeCodeBlock2|LogoCodeBlock2 = state.codeBlocks[commandName];
-
-        if (codeBlock === undefined) {
-          throw new Error('Function ' + commandName + ' does not exist!');
-        }
+      } else{
         // Check if there are enough args
         const lastArgIndex = index + 1 + codeBlock.numArgs;
         if (commandTokens.length < lastArgIndex) {
-          throw new Error('Too few arguments for function ' + commandName);
+          throw new Error(`Too few arguments for function ${commandName}`);
         }
+        commandArgs = commandTokens.slice(index + 1, lastArgIndex);
 
-        const commandArgs: string[] = commandTokens.slice(index + 1, lastArgIndex);
-        const argValues: string[] = commandArgs.map(arg => this.evaluateArgument(newState, arg));
-
-        if(this.isNativeCodeBlock(codeBlock)){
-          newState = (<NativeCodeBlock2>codeBlock).reducer.reduce(newState, argValues)
-        } else{
-          const commandTextWithArgs: string = this.formatCommandTextWithArgs(
-            (<LogoCodeBlock2>codeBlock).commandText,
-            argValues,
-          );
-          newState = this.reduce(newState, commandTextWithArgs);
+        if(!this.isNativeCodeBlock(codeBlock) || !isDefined(codeBlock.skipArgsEvaluation)){
+          commandArgs = commandArgs.map(arg => this.evaluateArgument(newState, arg));
         }
 
         index += codeBlock.numArgs + 1;
+      }
+
+      if(this.isNativeCodeBlock(codeBlock)){
+        newState = codeBlock.reducer.reduce(newState, commandArgs)
+      } else{
+        const commandTextWithArgs: string = this.formatCommandTextWithArgs(
+          codeBlock.commandText,
+          commandArgs,
+        );
+        newState = this.reduce(newState, commandTextWithArgs);
       }
     }
     return newState;
@@ -90,11 +92,11 @@ export class ExecuteCommandReducer implements Reducer<LogoStoreState, string>{
     }
   }
 
-  private isNativeCodeBlock(codeBlock: NativeCodeBlock2 | LogoCodeBlock2) {
+  private isNativeCodeBlock(codeBlock: NativeCodeBlock2 | LogoCodeBlock2): codeBlock is NativeCodeBlock2 {
     return isDefined(codeBlock['reducer']);
   }
 
-  private isNativeVariable(variable: NativeVariable2 | LogoVariable2) {
+  private isNativeVariable(variable: NativeVariable2 | LogoVariable2): variable is NativeVariable2 {
     return isDefined(variable['valueGetter']);
   }
 
