@@ -11,6 +11,31 @@ function roundLines(lines: Line[]): Line[]{
   return lines.map(line=>({start: roundPoint(line.start), end: roundPoint(line.end)}));
 }
 
+function runTest(reducer: LogoForwardReducer, direction: number, distance: number, startingPosition: Point, expectedEndingPosition: Point){
+  runTest2(reducer, direction, distance, startingPosition, expectedEndingPosition, true);
+  runTest2(reducer, direction, distance, startingPosition, expectedEndingPosition, false);
+}
+
+function runTest2(reducer: LogoForwardReducer, direction: number, distance: number, startingPosition: Point, expectedEndingPosition: Point, penDown: boolean){
+  const state = reducer.reduce(
+    {
+      ...new LogoStoreState(),
+      penDown,
+      turtleDirection: direction,
+      turtlePosition: startingPosition
+    },
+    [`${distance}`]
+  );
+
+  expect(roundPoint(state.turtlePosition)).toEqual(expectedEndingPosition);
+
+  if(penDown){
+      expect(roundLines(state.lines)).toEqual([{start: startingPosition, end: expectedEndingPosition}]);
+  } else{
+      expect(state.lines).toEqual([]);
+  }
+}
+
 describe('LogoForwardReducer', () => {
   let reducer: LogoForwardReducer;
   
@@ -19,72 +44,22 @@ describe('LogoForwardReducer', () => {
     });
 
     it('should correctly go up', () => {
-        const state = reducer.reduce(
-            {
-              ...new LogoStoreState(),
-              turtleDirection: 0,
-              turtlePosition: {w:20,h:20}
-            },
-            ['100']
-        );
-
-        expect(roundPoint(state.turtlePosition)).toEqual({w:20,h:-80});
-        expect(roundLines(state.lines)).toEqual([{start: {w:20,h:20}, end: {w:20,h:-80}}]);
+        runTest(reducer, 0, 100, {w:20,h:20}, {w:20,h:-80});
     });
 
     it('should correctly go right', () => {
-        const state = reducer.reduce(
-            {
-              ...new LogoStoreState(),
-              turtleDirection: 90,
-              turtlePosition: {w:20,h:20}
-            },
-            ['100']
-        );
-
-        expect(roundPoint(state.turtlePosition)).toEqual({w:120,h:20});
-        expect(roundLines(state.lines)).toEqual([{start: {w:20,h:20}, end: {w:120,h:20}}]);
+        runTest(reducer, 90, 100, {w:20,h:20}, {w:120,h:20});
     });
 
     it('should correctly go down', () => {
-        const state = reducer.reduce(
-            {
-              ...new LogoStoreState(),
-              turtleDirection: 180,
-              turtlePosition: {w:20,h:20}
-            },
-            ['100']
-        );
-
-        expect(roundPoint(state.turtlePosition)).toEqual({w:20,h:120});
-        expect(roundLines(state.lines)).toEqual([{start: {w:20,h:20}, end: {w:20,h:120}}]);
+        runTest(reducer, 180, 100, {w:20,h:20}, {w:20,h:120});
     });
 
     it('should correctly go left', () => {
-        const state = reducer.reduce(
-            {
-              ...new LogoStoreState(),
-              turtleDirection: 270,
-              turtlePosition: {w:20,h:20}
-            },
-            ['100']
-        );
-
-        expect(roundPoint(state.turtlePosition)).toEqual({w:-80,h:20});
-        expect(roundLines(state.lines)).toEqual([{start: {w:20,h:20}, end: {w:-80,h:20}}]);
+        runTest(reducer, 270, 100, {w:20,h:20}, {w:-80,h:20});
     });
 
     it('should correctly go diagonally', () => {
-        const state = reducer.reduce(
-            {
-              ...new LogoStoreState(),
-              turtleDirection: 45,
-              turtlePosition: {w:-100,h:30}
-            },
-            ['100']
-        );
-
-        expect(roundPoint(state.turtlePosition)).toEqual({w:-29,h:-41});
-        expect(roundLines(state.lines)).toEqual([{start: {w:-100,h:30}, end: {w:-29,h:-41}}]);
+        runTest(reducer, 45, 100, {w:-100,h:30}, {w:-29,h:-41});
     });
 });
