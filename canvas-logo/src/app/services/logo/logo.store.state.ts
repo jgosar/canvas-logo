@@ -9,6 +9,6 @@ export class LogoStoreState{
   turtlePosition: Point = {w:0,h:0};
   turtleDirection: number = 0;
   penDown: boolean = true;
-  codeBlocks: { [s: string]: CodeBlock2; } = {};
-  variables: { [s: string]: NativeVariable2|LogoVariable2; } = {};
+  codeBlocks: { [s: string]: CodeBlock2 } = {};
+  variables: { [s: string]: NativeVariable2|LogoVariable2 } = {};
 }

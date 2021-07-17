@@ -6,6 +6,7 @@ import { LogoStoreState } from "../logo.store.state";
 import { LogoVariable2 } from "../types/logo-variable-2";
 import { CodeBlock2 } from "../types/code-block-2";
 import { NativeVariable2 } from "../types/native-variable-2";
+import { evaluateArgument } from "src/app/helpers/logo-variable.helpers";
 
 @Injectable()
 export class ExecuteCommandReducer implements Reducer<LogoStoreState, string>{
@@ -36,7 +37,7 @@ export class ExecuteCommandReducer implements Reducer<LogoStoreState, string>{
 
   private executeCommand(state: LogoStoreState, codeBlock: CodeBlock2, commandArgs: string[]) {
     if(!isDefined(codeBlock.skipArgsEvaluation)){
-      commandArgs = commandArgs.map(arg => this.evaluateArgument(state, arg));
+      commandArgs = commandArgs.map(arg => evaluateArgument(state, arg));
     }
 
     if (isDefined(codeBlock.reducer)) {
@@ -66,32 +67,6 @@ export class ExecuteCommandReducer implements Reducer<LogoStoreState, string>{
       }
     }
     return commandTokens.slice(index + 1, lastArgIndex);
-  }
-
-  private evaluateArgument(state: LogoStoreState, argument: string): string {
-    if (argument.startsWith('\'')) {
-      return this.getVariableValue(state, argument.substring(1)).toString();
-    } else if (argument.includes(' ')) {
-      return argument;
-    } else {
-      return `${eval(argument)}`;
-    }
-  }
-
-  private getVariableValue(state: LogoStoreState, variableName: string): number {
-    variableName = variableName.toUpperCase();
-    const variable: LogoVariable2 | NativeVariable2 | undefined = state.variables[variableName];
-    if (variable === undefined) {
-      throw new Error('Variable ' + variableName + ' does not exist!');
-    } else if (this.isNativeVariable(variable)) {
-      return (<NativeVariable2>variable).valueGetter(state);
-    } else {
-      return (<LogoVariable2>variable).value;
-    }
-  }
-
-  private isNativeVariable(variable: NativeVariable2 | LogoVariable2): variable is NativeVariable2 {
-    return isDefined(variable['valueGetter']);
   }
 
   private formatCommandTextWithArgs(commandText: string, args: string[]): string{
