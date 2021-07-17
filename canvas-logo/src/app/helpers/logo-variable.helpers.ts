@@ -14,14 +14,13 @@ export function evaluateArgument(state: LogoStoreState, argument: string): strin
   }
 
   function getVariableValue(state: LogoStoreState, variableName: string): number {
-    variableName = variableName.toUpperCase();
     const variable: LogoVariable2 | NativeVariable2 | undefined = state.variables[variableName];
     if (variable === undefined) {
       throw new Error('Variable ' + variableName + ' does not exist!');
     } else if (isNativeVariable(variable)) {
-      return (<NativeVariable2>variable).valueGetter(state);
+      return variable.valueGetter(state);
     } else {
-      return (<LogoVariable2>variable).value;
+      return variable.value;
     }
   }
 

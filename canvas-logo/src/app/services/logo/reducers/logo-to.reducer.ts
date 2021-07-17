@@ -23,7 +23,7 @@ export class LogoToReducer implements Reducer<LogoStoreState, string[]>{
 
   // Input is a function definition, split into words without starting TO and final END
   private executeTOCommand(state: LogoStoreState, commandDefinition: string[]): LogoStoreState {
-    const commandName: string = commandDefinition[0].toUpperCase(); // The first word is a function name
+    const commandName: string = commandDefinition[0]; // The first word is a function name
 
     commandDefinition = commandDefinition.slice(1);
     const bodyStart: number = commandDefinition.findIndex(x => !x.startsWith(':')); // Start of the function body is the first word that does not start with :
@@ -41,7 +41,7 @@ export class LogoToReducer implements Reducer<LogoStoreState, string[]>{
       }
       return x;
     });
-    const commandBody = commandBodyWords.join(' ');
+    const commandBody = commandBodyWords.map(word=>word.includes(' ')?`[${word}]`:word).join(' ');
 
     return {
       ...state,

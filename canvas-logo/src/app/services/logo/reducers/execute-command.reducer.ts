@@ -82,19 +82,13 @@ export class ExecuteCommandReducer implements Reducer<LogoStoreState, string>{
   
   private tokenizeCommand(command: string): string[] {
     command = this.beautifyCommand(command);
-    const result: {[key: string]: string} = {main: command};
 
-    let subCommandCount: number = 0;
+    const bracketedExpressions: string[] = [];
+    let processedCommand: string = command;
+    
     let bracketLevel: number = 0;
     let bracketStartIndex: number = -1;
-    let isFunctionDefinition: boolean = false;
     for (let i = 0; i < command.length; i++) {
-      if (command.substring(i, i + 3).toUpperCase() === 'TO ') {
-        isFunctionDefinition = true;
-      } else if (command.substring(i, i + 4).toUpperCase() === ' END') {
-        isFunctionDefinition = false;
-      }
-
       if (command[i] === '[') {
         if (bracketLevel === 0) {
           bracketStartIndex = i;
@@ -104,14 +98,10 @@ export class ExecuteCommandReducer implements Reducer<LogoStoreState, string>{
       } else if (command[i] === ']') {
         bracketLevel--;
 
-        if (bracketLevel === 0 && !isFunctionDefinition) {
-          // Create a new command from the bracketed substring
-          const prnString = command.substring(bracketStartIndex, i + 1).trim();
-          const prnId = '@PRN' + subCommandCount;
-          subCommandCount++;
-
-          result[prnId] = prnString.substring(1, prnString.length - 1);
-          result['main']=replaceAll(result['main'],prnString, prnId);
+        if (bracketLevel === 0 ) {
+          const bracketedExpression: string = command.substring(bracketStartIndex, i + 1).trim();
+          bracketedExpressions.push(bracketedExpression.substring(1, bracketedExpression.length - 1));
+          processedCommand = processedCommand.replace(bracketedExpression, `bracketedExpression-${bracketedExpressions.length-1}`);
         }
         if (bracketLevel < 0) {
           throw new Error('More closing than opening brackets! position ' + i);
@@ -122,7 +112,6 @@ export class ExecuteCommandReducer implements Reducer<LogoStoreState, string>{
     if (bracketLevel !== 0) {
       throw new Error('Closing bracket missing!');
     }
-
-    return result['main'].split(' ').map(token=>token.startsWith('@PRN')?result[token]:token);;
+    return processedCommand.split(' ').map(token=>token.startsWith('bracketedExpression-')?bracketedExpressions[token.split('-')[1]]:token);;
   }
 }
