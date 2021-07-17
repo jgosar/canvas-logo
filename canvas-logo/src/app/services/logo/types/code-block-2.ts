@@ -1,9 +1,10 @@
 import { Reducer } from "src/app/utils/reducer-store/reducer";
 import { LogoStoreState } from "../logo.store.state";
 
-export interface NativeCodeBlock2 {
-  reducer: Reducer<LogoStoreState, string[]>;
+export interface CodeBlock2 {
+  reducer?: Reducer<LogoStoreState, string[]>;
+  commandText?: string;
   numArgs?: number;
-  terminatedByEnd?: true;
+  terminatedBy?: string;
   skipArgsEvaluation?: true;
 }
