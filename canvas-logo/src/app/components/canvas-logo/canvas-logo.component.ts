@@ -1,54 +1,55 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
-import { Subject } from 'rxjs';
-import { LogoStore } from 'src/app/services/logo/logo.store';
-import { Line } from 'src/app/types/geometry/line';
+import type {OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component} from '@angular/core';
+import {Subject} from 'rxjs';
+import type {LogoStore} from 'src/app/services/logo/logo.store';
+import type {Line} from 'src/app/types/geometry/line';
 
 @Component({
-  selector: 'cl-canvas-logo',
-  templateUrl: './canvas-logo.component.html',
-  styleUrls: ['./canvas-logo.component.less'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'cl-canvas-logo',
+    templateUrl: './canvas-logo.component.html',
+    styleUrls: ['./canvas-logo.component.less'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CanvasLogoComponent implements OnInit, OnDestroy {
-  lines: Line[] = [];
+    lines: Line[] = [];
 
-  output: string = 'Hello logo!';
-  currentCommand: string = '';
+    output: string = 'Hello logo!';
+    currentCommand: string = '';
 
-  private ngUnsubscribe$: Subject<void> = new Subject();
+    private ngUnsubscribe$: Subject<void> = new Subject();
 
-  //private logoEngine: LogoEngine;
+    // private logoEngine: LogoEngine;
 
-  constructor(public store: LogoStore) {
-    //this.logoEngine = new LogoEngine();
-    //this.logoEngine.output.subscribe(text => this.printOutput(text, 'bold'));
-  }
+    constructor(public store: LogoStore) {
+        // this.logoEngine = new LogoEngine();
+        // this.logoEngine.output.subscribe(text => this.printOutput(text, 'bold'));
+    }
 
-  ngOnInit(): void {
-    /*this.store.state$
+    ngOnInit(): void {
+        /* this.store.state$
       .pipe(takeUntil(this.ngUnsubscribe$))
       .subscribe(state=>{
           this.lines = state.lines;
       });*/
-  }
+    }
 
-  ngOnDestroy() {
-    this.ngUnsubscribe$.next();
-    this.ngUnsubscribe$.complete();
-  }
+    ngOnDestroy() {
+        this.ngUnsubscribe$.next();
+        this.ngUnsubscribe$.complete();
+    }
 
-  executeCommand() {
-    //this.logoEngine.executeCommand(this.currentCommand);
-    this.store.executeCommand(this.currentCommand);
-    this.currentCommand = '';
-    //this.lines = [...this.logoEngine.lines];
-  }
+    executeCommand() {
+        // this.logoEngine.executeCommand(this.currentCommand);
+        this.store.executeCommand(this.currentCommand);
+        this.currentCommand = '';
+        // this.lines = [...this.logoEngine.lines];
+    }
 
-  historyPrev() {}
+    historyPrev() {}
 
-  historyNext() {}
+    historyNext() {}
 
-  printOutput(text: string, style: null | 'red' | 'bold' = null) {
-    this.output += text; //TODO!
-  }
+    printOutput(text: string, style: null | 'red' | 'bold' = null) {
+        this.output += text; // TODO!
+    }
 }
