@@ -10,4 +10,6 @@ export class LogoStoreState {
     penDown: boolean = true;
     codeBlocks: {[s: string]: CodeBlock} = {};
     variables: {[s: string]: LogoVariable} = {};
+    history: string[] = [];
+    historyPointer: number = 0;
 }

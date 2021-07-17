@@ -4,9 +4,9 @@
 <div class="cl-canvas-logo__input">
     <input
         [(ngModel)]="currentCommand"
-        (keyup.enter)="this.executeCommand()"
-        (keyup.arrowup)="this.historyPrev()"
-        (keyup.arrowdown)="this.historyNext()"
+        (keyup.enter)="executeCommand()"
+        (keyup.arrowup)="store.historyPrev()"
+        (keyup.arrowdown)="store.historyNext()"
     />
 </div>
 <div class="cl-canvas-logo__console">

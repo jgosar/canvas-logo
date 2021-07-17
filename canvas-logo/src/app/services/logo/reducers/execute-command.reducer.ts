@@ -6,12 +6,17 @@ import type {LogoStoreState} from '../logo.store.state';
 import type {CodeBlock} from '../types/code-block';
 import {evaluateArgument} from 'src/app/helpers/logo-variable.helpers';
 
+export interface ExecuteCommandPayload {
+    command: string;
+    logToHistory?: boolean;
+}
+
 @Injectable()
-export class ExecuteCommandReducer implements Reducer<LogoStoreState, string> {
-    reduce(state: LogoStoreState, command: string): LogoStoreState {
+export class ExecuteCommandReducer implements Reducer<LogoStoreState, ExecuteCommandPayload> {
+    reduce(state: LogoStoreState, payload: ExecuteCommandPayload): LogoStoreState {
         let newState: LogoStoreState = {...state};
 
-        const commandTokens: string[] = this.tokenizeCommand(command);
+        const commandTokens: string[] = this.tokenizeCommand(payload.command);
         let index = 0;
 
         while (index < commandTokens.length) {
@@ -30,6 +35,14 @@ export class ExecuteCommandReducer implements Reducer<LogoStoreState, string> {
                 index++; // also parsed terminating word, such as END
             }
         }
+
+        if (payload.logToHistory) {
+            newState = {
+                ...newState,
+                history: [...newState.history, payload.command],
+                historyPointer: newState.history.length + 1,
+            };
+        }
         return newState;
     }
 
@@ -41,7 +54,7 @@ export class ExecuteCommandReducer implements Reducer<LogoStoreState, string> {
         if (isDefined(codeBlock.reducer)) {
             return codeBlock.reducer.reduce(state, commandArgs);
         } else {
-            return this.reduce(state, this.formatCommandTextWithArgs(codeBlock.commandText, commandArgs));
+            return this.reduce(state, {command: this.formatCommandTextWithArgs(codeBlock.commandText, commandArgs)});
         }
     }
 

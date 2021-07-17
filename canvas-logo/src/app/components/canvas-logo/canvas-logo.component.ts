@@ -1,7 +1,8 @@
 import type {OnDestroy, OnInit} from '@angular/core';
 import {ChangeDetectionStrategy, Component} from '@angular/core';
-import {Subject} from 'rxjs';
-import type {LogoStore} from 'src/app/services/logo/logo.store';
+import {Observable, Subject} from 'rxjs';
+import {distinctUntilChanged, map, takeUntil, tap} from 'rxjs/operators';
+import {LogoStore} from 'src/app/services/logo/logo.store';
 import type {Line} from 'src/app/types/geometry/line';
 
 @Component({
@@ -18,19 +19,10 @@ export class CanvasLogoComponent implements OnInit, OnDestroy {
 
     private ngUnsubscribe$: Subject<void> = new Subject();
 
-    // private logoEngine: LogoEngine;
-
-    constructor(public store: LogoStore) {
-        // this.logoEngine = new LogoEngine();
-        // this.logoEngine.output.subscribe(text => this.printOutput(text, 'bold'));
-    }
+    constructor(public store: LogoStore) {}
 
     ngOnInit(): void {
-        /* this.store.state$
-      .pipe(takeUntil(this.ngUnsubscribe$))
-      .subscribe(state=>{
-          this.lines = state.lines;
-      });*/
+        this.subscribeToStateUpdates();
     }
 
     ngOnDestroy() {
@@ -39,17 +31,23 @@ export class CanvasLogoComponent implements OnInit, OnDestroy {
     }
 
     executeCommand() {
-        // this.logoEngine.executeCommand(this.currentCommand);
         this.store.executeCommand(this.currentCommand);
         this.currentCommand = '';
-        // this.lines = [...this.logoEngine.lines];
     }
-
-    historyPrev() {}
-
-    historyNext() {}
 
     printOutput(text: string, style: null | 'red' | 'bold' = null) {
         this.output += text; // TODO!
+    }
+
+    private subscribeToStateUpdates() {
+        this.createCommandTextUpdater$().pipe(takeUntil(this.ngUnsubscribe$)).subscribe();
+    }
+
+    private createCommandTextUpdater$(): Observable<string> {
+        return this.store.state$.pipe(
+            map(state => (state.historyPointer < state.history.length ? state.history[state.historyPointer] : '')),
+            distinctUntilChanged(),
+            tap(commandText => (this.currentCommand = commandText))
+        );
     }
 }

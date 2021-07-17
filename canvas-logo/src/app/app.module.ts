@@ -14,6 +14,7 @@ import {LogoPenUpReducer} from './services/logo/reducers/logo-pen-up.reducer';
 import {LogoRepeatReducer} from './services/logo/reducers/logo-repeat.reducer';
 import {LogoRightReducer} from './services/logo/reducers/logo-right.reducer';
 import {LogoToReducer} from './services/logo/reducers/logo-to.reducer';
+import {ModifyHistoryPointerReducer} from './services/logo/reducers/modify-history-pointer.reducer';
 import {RegisterCommandReducer} from './services/logo/reducers/register-command.reducer';
 
 @NgModule({
@@ -30,6 +31,7 @@ import {RegisterCommandReducer} from './services/logo/reducers/register-command.
         LogoPenDownReducer,
         LogoToReducer,
         LogoMakeReducer,
+        ModifyHistoryPointerReducer,
     ],
     bootstrap: [AppComponent],
 })

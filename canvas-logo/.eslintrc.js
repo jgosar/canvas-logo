@@ -83,7 +83,6 @@ module.exports = {
       '@typescript-eslint/restrict-plus-operands': 'warn',
       '@typescript-eslint/triple-slash-reference': 'error',
       '@typescript-eslint/unified-signatures': 'error',
-      '@typescript-eslint/consistent-type-imports': 'warn',
       'arrow-body-style': 'warn',
       complexity: [
           'error',

@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import type {Reducer} from 'src/app/utils/reducer-store/reducer';
 import type {LogoStoreState} from '../logo.store.state';
-import type {ExecuteCommandReducer} from './execute-command.reducer';
+import {ExecuteCommandReducer} from './execute-command.reducer';
 
 @Injectable()
 export class LogoRepeatReducer implements Reducer<LogoStoreState, string[]> {
@@ -14,7 +14,7 @@ export class LogoRepeatReducer implements Reducer<LogoStoreState, string[]> {
         const command: string = args[1];
         const repeatsNum: number = parseFloat(repeats);
         for (let i: number = 0; i < repeatsNum; i++) {
-            newState = this.executeCommandReducer.reduce(newState, command);
+            newState = this.executeCommandReducer.reduce(newState, {command});
         }
         return newState;
     }
