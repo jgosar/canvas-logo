@@ -1,9 +1,7 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from "@angular/core";
-import { Subject } from "rxjs";
-import { takeUntil } from "rxjs/operators";
-import { LogoEngine } from "src/app/services/logo-engine-legacy/logo-engine-legacy";
-import { LogoStore } from "src/app/services/logo/logo.store";
-import { Line } from "src/app/types/geometry/line";
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
+import { Subject } from 'rxjs';
+import { LogoStore } from 'src/app/services/logo/logo.store';
+import { Line } from 'src/app/types/geometry/line';
 
 @Component({
   selector: 'cl-canvas-logo',
@@ -16,14 +14,13 @@ export class CanvasLogoComponent implements OnInit, OnDestroy {
 
   output: string = 'Hello logo!';
   currentCommand: string = '';
-  
+
   private ngUnsubscribe$: Subject<void> = new Subject();
 
   //private logoEngine: LogoEngine;
 
   constructor(public store: LogoStore) {
     //this.logoEngine = new LogoEngine();
-
     //this.logoEngine.output.subscribe(text => this.printOutput(text, 'bold'));
   }
 
@@ -36,26 +33,22 @@ export class CanvasLogoComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-      this.ngUnsubscribe$.next();
-      this.ngUnsubscribe$.complete();
+    this.ngUnsubscribe$.next();
+    this.ngUnsubscribe$.complete();
   }
 
-  executeCommand(){
+  executeCommand() {
     //this.logoEngine.executeCommand(this.currentCommand);
     this.store.executeCommand(this.currentCommand);
     this.currentCommand = '';
     //this.lines = [...this.logoEngine.lines];
   }
 
-  historyPrev(){
+  historyPrev() {}
 
-  }
-
-  historyNext(){
-    
-  }
+  historyNext() {}
 
   printOutput(text: string, style: null | 'red' | 'bold' = null) {
-    this.output += text;//TODO!
+    this.output += text; //TODO!
   }
 }

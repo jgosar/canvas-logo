@@ -1,8 +1,10 @@
 <div #canvasContainer class="cl-zoomable-canvas__container">
-  <canvas #canvas
+  <canvas
+    #canvas
     (mousemove)="this.mouseMove($event)"
     (mousedown)="this.mouseDown($event)"
     (mouseup)="this.mouseUp($event)"
-    (wheel)="this.onScroll($event)">
+    (wheel)="this.onScroll($event)"
+  >
   </canvas>
 </div>

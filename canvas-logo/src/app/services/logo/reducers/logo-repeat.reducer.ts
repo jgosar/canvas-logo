@@ -4,14 +4,11 @@ import { LogoStoreState } from '../logo.store.state';
 import { ExecuteCommandReducer } from './execute-command.reducer';
 
 @Injectable()
-export class LogoRepeatReducer implements Reducer<LogoStoreState, string[]>{
-  constructor(
-    private executeCommandReducer: ExecuteCommandReducer,
-  ){
-  }
+export class LogoRepeatReducer implements Reducer<LogoStoreState, string[]> {
+  constructor(private executeCommandReducer: ExecuteCommandReducer) {}
 
-  reduce(state: LogoStoreState, args: string[]): LogoStoreState{
-    let newState: LogoStoreState = {...state};
+  reduce(state: LogoStoreState, args: string[]): LogoStoreState {
+    let newState: LogoStoreState = { ...state };
 
     const repeats: string = args[0];
     const command: string = args[1];

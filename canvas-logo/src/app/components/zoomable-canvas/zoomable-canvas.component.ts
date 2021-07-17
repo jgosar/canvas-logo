@@ -1,4 +1,14 @@
-import { Component, ViewChild, ElementRef, OnInit, ChangeDetectionStrategy, OnChanges, Input, HostListener, AfterViewChecked } from '@angular/core';
+import {
+  Component,
+  ViewChild,
+  ElementRef,
+  OnInit,
+  ChangeDetectionStrategy,
+  OnChanges,
+  Input,
+  HostListener,
+  AfterViewChecked,
+} from '@angular/core';
 import { Subject } from 'rxjs';
 import { distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { Line } from 'src/app/types/geometry/line';
@@ -22,17 +32,19 @@ export class ZoomableCanvasComponent implements OnInit, OnChanges, AfterViewChec
   canvas!: ElementRef;
 
   private zoomLevel: number = 0;
-  private renderOffset: RenderingCoordinates|undefined;
-  private mouseDownPoint: Point|undefined;
-  
+  private renderOffset: RenderingCoordinates | undefined;
+  private mouseDownPoint: Point | undefined;
+
   private ngUnsubscribe$: Subject<void> = new Subject();
   private viewportResized$: Subject<RenderingCoordinates> = new Subject<RenderingCoordinates>();
 
   ngOnInit(): void {
-    this.viewportResized$.pipe(
-      distinctUntilChanged((size1,size2)=>size1.x===size2.x && size1.y===size2.y),
-      takeUntil(this.ngUnsubscribe$)
-    ).subscribe(this.resizeAndRedraw.bind(this));
+    this.viewportResized$
+      .pipe(
+        distinctUntilChanged((size1, size2) => size1.x === size2.x && size1.y === size2.y),
+        takeUntil(this.ngUnsubscribe$)
+      )
+      .subscribe(this.resizeAndRedraw.bind(this));
     this.onResize();
   }
 
@@ -46,22 +58,21 @@ export class ZoomableCanvasComponent implements OnInit, OnChanges, AfterViewChec
 
   @HostListener('window:resize', ['$event'])
   onResize() {
-
     this.viewportResized$.next(this.getViewportSize());
   }
 
-  public resizeAndRedraw(viewportSize: RenderingCoordinates): void {
+  resizeAndRedraw(viewportSize: RenderingCoordinates): void {
     const focus: Point = this.getFocus();
 
     this.canvas.nativeElement.width = viewportSize.x;
     this.canvas.nativeElement.height = viewportSize.y;
 
     this.setFocus(focus);
-    
+
     this.draw();
   }
 
-  public mouseMove(event: MouseEvent) {
+  mouseMove(event: MouseEvent) {
     if (this.mouseDownPoint) {
       const mouseCoords: RenderingCoordinates = this.getEventCoordinates(event);
       this.recalculateOffset(this.mouseDownPoint, mouseCoords);
@@ -69,16 +80,16 @@ export class ZoomableCanvasComponent implements OnInit, OnChanges, AfterViewChec
     }
   }
 
-  public mouseDown(event: MouseEvent) {
+  mouseDown(event: MouseEvent) {
     const mouseCoords: RenderingCoordinates = this.getEventCoordinates(event);
     this.mouseDownPoint = this.coordinatesToPoint(mouseCoords);
   }
 
-  public mouseUp(e: MouseEvent) {
+  mouseUp(e: MouseEvent) {
     this.mouseDownPoint = undefined;
   }
 
-  public onScroll(event: WheelEvent) {
+  onScroll(event: WheelEvent) {
     event.preventDefault();
     const mouseCoords: RenderingCoordinates = this.getEventCoordinates(event);
 
@@ -95,13 +106,13 @@ export class ZoomableCanvasComponent implements OnInit, OnChanges, AfterViewChec
 
   private draw() {
     const context = (this.canvas.nativeElement as HTMLCanvasElement).getContext('2d');
-    if(!context || !this.renderOffset){
+    if (!context || !this.renderOffset) {
       return;
     }
 
     context.clearRect(0, 0, this.canvas.nativeElement.width, this.canvas.nativeElement.height);
 
-    this.lines.forEach(line=>{
+    this.lines.forEach((line) => {
       const start: RenderingCoordinates = this.pointToCoordinates(line.start);
       const end: RenderingCoordinates = this.pointToCoordinates(line.end);
 
@@ -113,25 +124,25 @@ export class ZoomableCanvasComponent implements OnInit, OnChanges, AfterViewChec
     });
   }
 
-  private setFocus(focus: Point){
+  private setFocus(focus: Point) {
     this.recalculateOffset(focus, this.getCanvasCentre());
   }
 
-  private getFocus(): Point{
-    if(!this.renderOffset){
-      return {w: 0, h: 0};
+  private getFocus(): Point {
+    if (!this.renderOffset) {
+      return { w: 0, h: 0 };
     }
     return this.coordinatesToPoint(this.getCanvasCentre());
   }
 
-  private getCanvasCentre(): RenderingCoordinates{
+  private getCanvasCentre(): RenderingCoordinates {
     return {
       x: this.canvas.nativeElement.width / 2,
-      y: this.canvas.nativeElement.height / 2
+      y: this.canvas.nativeElement.height / 2,
     };
   }
 
-  private getViewportSize(): RenderingCoordinates{
+  private getViewportSize(): RenderingCoordinates {
     return {
       x: this.canvasContainer.nativeElement.clientWidth,
       y: this.canvasContainer.nativeElement.clientHeight,
@@ -144,8 +155,8 @@ export class ZoomableCanvasComponent implements OnInit, OnChanges, AfterViewChec
     const zoomMultiplier: number = this.getZoomMultiplier();
     return {
       x: this.renderOffset!.x + point.w * zoomMultiplier,
-      y: this.renderOffset!.y + point.h * zoomMultiplier
-    }
+      y: this.renderOffset!.y + point.h * zoomMultiplier,
+    };
   }
 
   private coordinatesToPoint(coordinates: RenderingCoordinates): Point {
@@ -155,20 +166,20 @@ export class ZoomableCanvasComponent implements OnInit, OnChanges, AfterViewChec
     return {
       w: (coordinates.x - this.renderOffset!.x) / zoomMultiplier,
       h: (coordinates.y - this.renderOffset!.y) / zoomMultiplier,
-    }
+    };
   }
 
-  private recalculateOffset(point: Point, coordinates: RenderingCoordinates){
+  private recalculateOffset(point: Point, coordinates: RenderingCoordinates) {
     // get renderOffset from known point and coordinates
     // B=A-C*D
     const zoomMultiplier: number = this.getZoomMultiplier();
     this.renderOffset = {
       x: coordinates.x - point.w * zoomMultiplier,
-      y: coordinates.y - point.h * zoomMultiplier
+      y: coordinates.y - point.h * zoomMultiplier,
     };
   }
 
-  private getZoomMultiplier(): number{
+  private getZoomMultiplier(): number {
     return Math.pow(ZOOM_STEP_MULTIPLIER, this.zoomLevel);
   }
 

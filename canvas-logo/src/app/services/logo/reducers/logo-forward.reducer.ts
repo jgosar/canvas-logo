@@ -6,8 +6,8 @@ import { Reducer } from 'src/app/utils/reducer-store/reducer';
 import { LogoStoreState } from '../logo.store.state';
 
 @Injectable()
-export class LogoForwardReducer implements Reducer<LogoStoreState, string[]>{
-  reduce(state: LogoStoreState, args: string[]): LogoStoreState{
+export class LogoForwardReducer implements Reducer<LogoStoreState, string[]> {
+  reduce(state: LogoStoreState, args: string[]): LogoStoreState {
     const distance: string = args[0];
     const distanceNum: number = parseFloat(distance);
     const distanceW = Math.sin(degToRad(state.turtleDirection)) * distanceNum;
@@ -15,22 +15,22 @@ export class LogoForwardReducer implements Reducer<LogoStoreState, string[]>{
 
     const newTurtlePosition: Point = {
       w: state.turtlePosition.w + distanceW,
-      h: state.turtlePosition.h + distanceH
+      h: state.turtlePosition.h + distanceH,
     };
     const newLines: Line[] = [];
 
     if (state.penDown) {
       const newLine: Line = {
         start: state.turtlePosition,
-        end: newTurtlePosition
-      }
+        end: newTurtlePosition,
+      };
       newLines.push(newLine);
     }
 
     return {
       ...state,
       turtlePosition: newTurtlePosition,
-      lines: [...state.lines, ...newLines]
-    }
+      lines: [...state.lines, ...newLines],
+    };
   }
 }

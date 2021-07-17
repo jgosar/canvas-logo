@@ -17,16 +17,20 @@ import { LogoToReducer } from './services/logo/reducers/logo-to.reducer';
 import { RegisterCommandReducer } from './services/logo/reducers/register-command.reducer';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    ZoomableCanvasComponent,
-    CanvasLogoComponent
+  declarations: [AppComponent, ZoomableCanvasComponent, CanvasLogoComponent],
+  imports: [BrowserModule, FormsModule],
+  providers: [
+    LogoStore,
+    LogoForwardReducer,
+    RegisterCommandReducer,
+    ExecuteCommandReducer,
+    LogoRightReducer,
+    LogoRepeatReducer,
+    LogoPenUpReducer,
+    LogoPenDownReducer,
+    LogoToReducer,
+    LogoMakeReducer,
   ],
-  imports: [
-    BrowserModule,
-    FormsModule
-  ],
-  providers: [LogoStore, LogoForwardReducer, RegisterCommandReducer, ExecuteCommandReducer, LogoRightReducer, LogoRepeatReducer, LogoPenUpReducer, LogoPenDownReducer, LogoToReducer, LogoMakeReducer],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}
