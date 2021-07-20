@@ -1,12 +1,14 @@
 <div class="cl-canvas-logo__canvas">
-  <cl-zoomable-canvas [lines]="store.state.lines"></cl-zoomable-canvas>
+    <cl-zoomable-canvas [lines]="store.state.lines"></cl-zoomable-canvas>
 </div>
 <div class="cl-canvas-logo__input">
-  <input [(ngModel)]="currentCommand"
-    (keyup.enter)="this.executeCommand()"
-    (keyup.arrowup)="this.historyPrev()"
-    (keyup.arrowdown)="this.historyNext()" />
+    <input
+        [(ngModel)]="currentCommand"
+        (keyup.enter)="executeCommand()"
+        (keyup.arrowup)="store.historyPrev()"
+        (keyup.arrowdown)="store.historyNext()"
+    />
 </div>
 <div class="cl-canvas-logo__console">
-  {{output}}
+    {{ output }}
 </div>
